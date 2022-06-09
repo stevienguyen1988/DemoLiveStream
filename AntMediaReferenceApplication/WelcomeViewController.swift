@@ -56,14 +56,13 @@ class WelcomeViewController: UIViewController {
     {
         sharedDefault.set(self.roomField.text , forKey: "streamId")
     }
-    
-    
+        
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.setGesture()
         
         self.screenRecord.preferredExtension = "com.thai.ios.sdk.ScreenShare";
-        self.screenRecord.showsMicrophoneButton = true;
+        self.screenRecord.showsMicrophoneButton = false;
 
         self.roomField.text = "stream1"
         sharedDefault.set(self.roomField.text , forKey: "streamId")

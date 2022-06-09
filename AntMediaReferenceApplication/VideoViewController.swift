@@ -10,7 +10,9 @@ import UIKit
 import WebRTC
 import AVFoundation
 import WebRTCiOSSDK
+import ReplayKit
 
+@available(iOS 12.0, *)
 class VideoViewController: UIViewController {
     
     @IBOutlet weak var pipVideoView: UIView!
@@ -20,7 +22,7 @@ class VideoViewController: UIViewController {
     
     // Auto Layout Constraints used for animations
     @IBOutlet weak var containerLeftConstraint: NSLayoutConstraint?
-    var audioPlayer: AVAudioPlayer?
+    
     let client: AntMediaClient = AntMediaClient.init()
     var clientUrl: String!
     var clientStreamId: String!
@@ -28,29 +30,45 @@ class VideoViewController: UIViewController {
     var clientMode: AntMediaClientMode!
     var tapGesture: UITapGestureRecognizer!
     
+    var player:AVPlayer?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setGesture()
     }
-    func playSound() {
-        if let audioPlayer = audioPlayer, audioPlayer.isPlaying { audioPlayer.stop() }
-
-            guard let soundURL = Bundle.main.url(forResource: "test", withExtension: "mp3") else { return }
-
-            do {
-                try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, mode: AVAudioSession.Mode.moviePlayback)
-                try AVAudioSession.sharedInstance().setActive(true)
-                audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
-                audioPlayer?.prepareToPlay()
-                audioPlayer?.play()
-                audioPlayer?.volume = 100
-            } catch let error {
-                print(error.localizedDescription)
-            }
+    
+    @IBOutlet weak var screenRecord: RPSystemBroadcastPickerView!;
+    
+    var started = false;
+    @objc func pickerAction() {
+        NSLog("Picker aciton is called");
+        if (!started) {
+          self.client.start();
+        }
+        else {
+            self.client.stop();
+        }
+        started = !started;
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.playSound()
+        
+        
+        let url = URL(string: "https://s3.amazonaws.com/kargopolov/kukushka.mp3")
+        let playerItem:AVPlayerItem = AVPlayerItem(url: url!)
+        player = AVPlayer(playerItem: playerItem)
+        player?.play();
+        
+        for subviews in screenRecord.subviews {
+            if let button = subviews as? UIButton {
+                button.addTarget(self, action: #selector(pickerAction), for: .touchUpInside)
+            }
+        }
+        
+        self.screenRecord.preferredExtension = "io.antmedia.ios.sdk1.ScreenShare";
+        self.screenRecord.showsMicrophoneButton = false;
+        
         self.client.delegate = self
         self.client.setDebug(true)
         self.client.setOptions(url: self.clientUrl, streamId: self.clientStreamId, token: self.clientToken, mode: self.clientMode, enableDataChannel: true, captureScreenEnabled:false)
@@ -105,9 +123,11 @@ class VideoViewController: UIViewController {
         //Enable below method to have the mirror effect
         //self.mirrorView(view: fullVideoView);
         
-        self.client.start()
+        //self.client.start()
     }
     
+    
+   
     /*
      * Mirror the view. fullVideoView or pipViewVideo can provided as parameter
      */
@@ -221,6 +241,7 @@ class VideoViewController: UIViewController {
    
 }
 
+@available(iOS 12.0, *)
 extension VideoViewController: AntMediaClientDelegate {
     
     func clientDidConnect(_ client: AntMediaClient) {

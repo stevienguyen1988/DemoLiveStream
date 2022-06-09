@@ -72,9 +72,7 @@ class SampleHandler: RPBroadcastSampleHandler, AntMediaClientDelegate {
     
 
     let client: AntMediaClient = AntMediaClient.init()
-    
-    let audioMicClient: AntMediaClient = AntMediaClient.init();
-    
+        
     var videoEnabled: Bool = true;
     var audioEnabled: Bool = true;
     
@@ -82,7 +80,7 @@ class SampleHandler: RPBroadcastSampleHandler, AntMediaClientDelegate {
         // User has requested to start the broadcast. Setup info from the UI extension can be supplied but optional.
         
         let sharedDefault = UserDefaults(suiteName: "group.com.thai.ios.sdk")!
-
+        
         let streamId = sharedDefault.object(forKey: "streamId");
         let url = sharedDefault.object(forKey: "url");
         let token = sharedDefault.object(forKey: "token");
@@ -110,15 +108,22 @@ class SampleHandler: RPBroadcastSampleHandler, AntMediaClientDelegate {
             finishBroadcastWithError(NSError(domain: "ScreenShare", code: -2, userInfo: userInfo));
         }
         else {
+            
+            videoEnabled = false;
+            audioEnabled = true;
             NSLog("----> streamId: %@ , websocket url: %@, videoEnabled: %d , audioEnabled: %d", streamId as! String, url as! String,
                   videoEnabled, audioEnabled);
         
+            // audio client
+            let audioStreamId = "audioStream1";
+            
             self.client.delegate = self
             self.client.setDebug(true)
-            self.client.setOptions(url: url as! String, streamId: streamId as! String, token: token as? String ?? "", mode: AntMediaClientMode.publish, enableDataChannel: true, captureScreenEnabled: true);
+            self.client.setOptions(url: url as! String, streamId: audioStreamId as! String, token: token as? String ?? "", mode: AntMediaClientMode.publish, enableDataChannel: true, captureScreenEnabled: false);
             
+         
             if (videoEnabled != nil) {
-                self.client.setVideoEnable(enable: videoEnabled as! Bool);
+                self.client.setVideoEnable(enable: videoEnabled);
                 self.client.setExternalVideoCapture(externalVideoCapture: true);
             }
                     
@@ -128,20 +133,7 @@ class SampleHandler: RPBroadcastSampleHandler, AntMediaClientDelegate {
             
             self.client.start();
             
-            
-            //mic audio client
-            let audioStreamId = "audioStream1";
-            self.audioMicClient.delegate = self
-            self.audioMicClient.setDebug(true)
-            self.audioMicClient.setOptions(url: url as! String, streamId: audioStreamId , token: token as? String ?? "", mode: AntMediaClientMode.publish, enableDataChannel: true, captureScreenEnabled: false);
-            
-            self.audioMicClient.setVideoEnable(enable: false);
-                    
-            self.audioMicClient.setExternalAudio(externalAudioEnabled: true)
-            
-            self.audioMicClient.initPeerConnection();
-            
-            self.audioMicClient.start();
+    
             
         }
         
@@ -158,8 +150,6 @@ class SampleHandler: RPBroadcastSampleHandler, AntMediaClientDelegate {
     
     override func broadcastFinished() {
         self.client.stop();
-        
-        self.audioMicClient.stop()
     }
     
     override func processSampleBuffer(_ sampleBuffer: CMSampleBuffer, with sampleBufferType: RPSampleBufferType) {
@@ -173,9 +163,8 @@ class SampleHandler: RPBroadcastSampleHandler, AntMediaClientDelegate {
             break
         case RPSampleBufferType.audioApp:
             // Handle audio sample buffer for app audio
-            NSLog("processSamplebuffer audio");
+            //NSLog("processSamplebuffer audio");
             if audioEnabled {
-                print("test test")
                 self.client.deliverExternalAudio(sampleBuffer: sampleBuffer);
             }
             break
@@ -186,7 +175,6 @@ class SampleHandler: RPBroadcastSampleHandler, AntMediaClientDelegate {
            // if audioEnabled {
            //     self.client.deliverExternalAudio(sampleBuffer: sampleBuffer);
            // }
-            self.audioMicClient.deliverExternalAudio(sampleBuffer: sampleBuffer);
             break
         @unknown default:
             // Handle other sample buffer types

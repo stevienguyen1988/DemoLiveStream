@@ -389,6 +389,11 @@ WebRTC Live Streaming</string>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ln3-RJ-FFl" customClass="RPSystemBroadcastPickerView">
+                                <rect key="frame" x="137" y="290" width="101" height="67"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="nVm-o6-c59"/>
                         <color key="backgroundColor" red="0.32549019607843138" green="0.32549019607843138" blue="0.32549019607843138" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -413,11 +418,12 @@ WebRTC Live Streaming</string>
                         <outlet property="fullVideoView" destination="cFD-yb-BM7" id="O1R-sI-ZGo"/>
                         <outlet property="modeLabel" destination="jr8-Ya-8WG" id="PuP-fa-HB0"/>
                         <outlet property="pipVideoView" destination="lwh-ZV-HkX" id="blI-IM-zkz"/>
+                        <outlet property="screenRecord" destination="Ln3-RJ-FFl" id="Js6-Ni-4nV"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="O0m-K1-lh4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1197.1014492753625" y="123.91304347826087"/>
+            <point key="canvasLocation" x="1196" y="123.68815592203899"/>
         </scene>
     </scenes>
     <resources>

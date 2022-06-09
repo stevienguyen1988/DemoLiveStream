@@ -349,7 +349,8 @@ class WebRTCClient: NSObject {
         {
             //try with screencast video source
             
-            self.videoCapturer = RTCCustomFrameCapturer.init(delegate: videoSource, height: targetHeight, externalCapture: externalVideoCapture, videoEnabled: true, audioEnabled: externalAudio)
+            self.videoCapturer = RTCCustomFrameCapturer.init(delegate: videoSource, height: targetHeight, externalCapture: externalVideoCapture, videoEnabled: videoEnabled, audioEnabled: externalAudio)
+            (self.videoCapturer as? RTCCustomFrameCapturer)?.setWebRTCClient(webRTCClient: self);
             (self.videoCapturer as? RTCCustomFrameCapturer)?.startCapture()
         }
         else {
@@ -369,7 +370,6 @@ class WebRTCClient: NSObject {
     }
     
     private func addLocalMediaStream() -> Bool {
-        
         
         AntMediaClient.printf("Add local media streams")
         if (self.videoEnabled)
